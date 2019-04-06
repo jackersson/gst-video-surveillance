@@ -366,7 +366,7 @@ class BatchElement(QueueBasedElement):  # OneToManyElement
                 - timeout: float (or None) (see Queue.put() )
         """
         data = self.get(timeout=timeout)
-        if data is not None:
+        if data is None:
             return
 
         self._buffers.append(data)

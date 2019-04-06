@@ -98,10 +98,10 @@ class GstPluginPy(Gst.Element):
                 self.model.process(timeout=0.1, **gst_data)
 
         except Exception as e:
-            logging.error(e)
+            # logging.error(e)
             # traceback.print_exc()
-            pass
             # return Gst.FlowReturn.ERROR
+            pass
 
         return self.srcpad.push(buffer)
 

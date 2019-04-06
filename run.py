@@ -1,3 +1,8 @@
+"""
+
+    python run.py -c single
+"""
+
 import argparse
 import importlib.util
 from types import ModuleType

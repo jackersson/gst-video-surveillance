@@ -90,14 +90,19 @@ class TfObjectDetectionModel(object):
 
         self.session = tf.Session(graph=graph, config=config)
 
+        print(f"Model {weights} placed on {device}")
+
         # Taken from official website
+        # https://github.com/tensorflow/models/blob/master/research/object_detection/object_detection_tutorial.ipynb
         self.input = graph.get_tensor_by_name("image_tensor:0")
         self.input_shape = input_shape
+        self.input_shape = tuple(self.input_shape)
 
         # print([n.name for n in graph.as_graph_def().node][:10])
         # print("Shape : ", self.input.shape)
 
         # Taken from official website
+        # https://github.com/tensorflow/models/blob/master/research/object_detection/object_detection_tutorial.ipynb
         output_names = ["detection_classes:0",
                         "detection_boxes:0",
                         "detection_scores:0"]
@@ -114,6 +119,7 @@ class TfObjectDetectionModel(object):
         return self._process_safe(np.expand_dims(self._preprocess(image), 0), image.shape[:2][::-1])[0]
 
     def process_batch(self, images: List[np.ndarray]) -> List[dict]:
+        print(f"Processing {len(images)} images")
         images_ = np.stack([self._preprocess(image) for image in images])
         return self._process_safe(images_, images[0].shape[:2][::-1])
 
@@ -170,10 +176,12 @@ def tf_object_detection_model_from_config(config: dict) -> TfObjectDetectionMode
     labels = load_labels_from_file(config['labels'])
 
     return TfObjectDetectionModel(weights=config['weights'],
-                                  threshold=config['threshold'],
-                                  device=config['device'],
-                                  per_process_gpu_memory_fraction=config['per_process_gpu_memory_fraction'],
-                                  labels=labels)
+                                  threshold=config.get('threshold', 0.5),
+                                  device=config.get('device', "/device:CPU:0"),
+                                  per_process_gpu_memory_fraction=config.get('per_process_gpu_memory_fraction', 0.0),
+                                  labels=labels,
+                                  log_device_placement=config.get("log_device_placemenent", False),
+                                  input_shape=config.get('input_shape', (300, 300)))
 
 
 class ObjectDetectorAdapter(IModule):

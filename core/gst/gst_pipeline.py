@@ -29,7 +29,6 @@ class QueueBasedElementsFactory:
             elif i == n:
                 elements.append(SinkElement(m, topic=source_id, sink=previous_src))
             else:
-                print(m.batch_size)
                 if m.is_batch_enabled:
                     batch_element = self._get_batch_element(m)
                     elements[i - 1].src = batch_element.sink
@@ -38,10 +37,13 @@ class QueueBasedElementsFactory:
                 else:
                     elements.append(TransformElement(m, src=self._create_link(), sink=previous_src, topic=source_id))
 
+        '''
+        # Was just a check that everything connected in a right way
         for i, e in enumerate(elements):
             if i > 0:
                 # assert e.sink == elements[i-1].src
                 print(f"topics {elements[i-1]}->{e} : ({elements[i-1].topic}) -> ({e.topic})")
+        '''
         return elements
 
     def _get_batch_element(self, module: IModule) -> BatchElement:
@@ -70,7 +72,7 @@ class GstPipeline(object):
         video_source.modules = [GstBufferToFrameDataAdapter(source_id=video_source.source_id)] + video_source.modules
 
         self._elements = self.ELEMENTS_FACTORY.from_modules(video_source.modules, source_id=video_source.source_id)
-        print(f" {index} : {self._elements} ")
+        # print(f" {index} : {self._elements} ")
 
         pipeline_builder = get_gst_pipeline_string_builder(video_source, index=index)
         print(f"gst-launch-1.0 {pipeline_builder.gst_launch}")
