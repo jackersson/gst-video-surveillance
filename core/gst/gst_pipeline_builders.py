@@ -78,7 +78,7 @@ class GstPipelineStringBuilder:
 
     @property
     def _gst_image_sink(self) -> List[str]:
-        image_sink = "gtksink" if self.config.show_window else "fakesink"
+        image_sink = "autovideosink" if self.config.show_window else "fakesink"
         if self.config.show_fps:
             image_sink = f"fpsdisplaysink video-sink={image_sink}"
             image_sink = gst_named_plugin(image_sink, self.fps_plugin_name)
@@ -87,7 +87,7 @@ class GstPipelineStringBuilder:
                 image_sink, self.image_sink_plugin_name)
 
         image_sink = gst_synced_plugin(image_sink, self.config.sync)
-        if "gtksink" in image_sink:
+        if "autovideosink" in image_sink:
             image_sink = ['videoconvert', image_sink]
         return image_sink if isinstance(image_sink, list) else [image_sink]
 
