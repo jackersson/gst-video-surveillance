@@ -6,7 +6,9 @@ import os
 
 from core.structures import VideoSourceConfig
 
-from core.modules import ObjectDetectionOverlayAdapter, ObjectDetectorAdapter, TrackerIOUAdapter
+from core.modules import ObjectDetectionOverlayAdapter, ObjectDetectorAdapter
+from core.modules import TrackerIOUAdapter, FilePublisher
+
 from core.modules.tf_object_detection import tf_object_detection_model_from_file
 from core.modules.object_detection_overlay import ColorPicker, TracksOverlayCairo
 
@@ -20,6 +22,7 @@ video_source_config = VideoSourceConfig(
     modules=[
         ObjectDetectorAdapter(object_detection_model),
         TrackerIOUAdapter(iou_threshold=0.4, max_frames_count_no_detections=8),
+        FilePublisher(os.path.abspath("out.json")),
         ObjectDetectionOverlayAdapter(TracksOverlayCairo(colors=colors, line_thickness_scaler=0.0035))
     ],
     show_window=True,

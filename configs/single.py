@@ -1,3 +1,6 @@
+"""
+    Runs pipeline for a single video stream
+"""
 import os
 
 from core.structures import VideoSourceConfig
