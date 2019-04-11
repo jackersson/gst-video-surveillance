@@ -1,3 +1,8 @@
+"""
+    Generates sequence of plugins for gst-launch-1.0
+"""
+
+
 import os
 from typing import Optional, List
 

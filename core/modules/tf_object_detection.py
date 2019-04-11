@@ -199,6 +199,7 @@ class ObjectDetectorAdapter(IModule):
 
         objects = self.model.process_single(data.color)
         data.actives = [ObjectInfo.from_json(obj) for obj in objects]
+        # print(data.actives)
         return data
 
     def process_batch(self, data: List[FrameData], **kwargs) -> List[FrameData]:

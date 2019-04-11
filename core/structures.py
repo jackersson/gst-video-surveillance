@@ -1,8 +1,9 @@
 import os
 import numpy as np
 from queue import Queue
+from copy import deepcopy
 
-from typing import List, Tuple, Optional, Any
+from typing import List, Tuple, Optional, Union, Any
 from abc import ABCMeta, abstractmethod
 
 
@@ -10,7 +11,8 @@ class ObjectInfo:
     """ Stores information about object """
 
     def __init__(self, bounding_box: Tuple[int, int, int, int],
-                 confidence: float = 1.0, class_name: str = None):
+                 confidence: float = 1.0, class_name: str = None,
+                 track_id: Union[int, str]=None):
         """
         :param bounding_box: int[4] - [x, y, w, h]
         :param confidence: [0.0, 1.0]
@@ -19,20 +21,23 @@ class ObjectInfo:
         self.class_name = class_name
         self.bounding_box = bounding_box
         self.confidence = confidence
+        self.track_id = track_id
 
     @property
     def as_json(self):
         return {
             "class_name": self.class_name,
             "bounding_box": self.bounding_box,
-            "confidence": self.confidence
+            "confidence": self.confidence,
+            "track_id": self.track_id
         }
 
     @staticmethod
     def from_json(value: dict):
         return ObjectInfo(bounding_box=value["bounding_box"],
                           confidence=value["confidence"],
-                          class_name=value["class_name"])
+                          class_name=value["class_name"],
+                          track_id=value.get("track_id", None))
 
 
 class FrameData:
@@ -44,7 +49,8 @@ class FrameData:
     def __init__(self, source_id: str,
                  color: np.ndarray,
                  frame_offset: int = 0,
-                 actives: List[ObjectInfo] = None):
+                 actives: List[ObjectInfo] = None,
+                 non_actives: List[ObjectInfo] = None):
         """
         :param color: image of size [h, w, c], (RGB-colorspace, c=3)
         :param source_id: unique identifier of video source
@@ -56,6 +62,7 @@ class FrameData:
         self.source_id = source_id
         self.frame_offset = frame_offset
         self.actives = actives or []
+        self.non_actives = non_actives or []
 
     @property
     def has_color(self) -> bool:
@@ -132,6 +139,7 @@ class VideoSourceConfig:
 
 
 class QueueBasedElement:
+    """ Base element to be passed to GstPluginPy """
 
     __metaclass__ = ABCMeta
 
@@ -409,7 +417,7 @@ class MediaSourceType:
     HTTP = "http"
 
 
-def get_media_source_type(source):
+def get_media_source_type(source: str) -> MediaSourceType:
     source = str(source)
 
     if MediaSourceType.RTSP in source:

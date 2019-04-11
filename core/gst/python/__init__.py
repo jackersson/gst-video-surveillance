@@ -1,12 +1,12 @@
 """
+    Registers plugins statically
+    Explained: http://lifestyletransfer.com/how-to-create-simple-blurfilter-with-gstreamer-in-python-using-opencv/
+
     To use plugins from command line:
         export GST_PLUGIN_PATH=$GST_PLUGIN_PATH:$PWD
 """
 
-# TODO come back to it
 from pygst_utils import Gst, GObject
-# Gst.init(None)
-
 from .gstplugin_py import GstPluginPy
 
 
@@ -55,6 +55,7 @@ def register(class_info):
                                       source, package, origin):
         raise ImportError("Plugin {} not registered".format(name))
     return True
+
 
 # Register plugins statically
 register(GstPluginPy)

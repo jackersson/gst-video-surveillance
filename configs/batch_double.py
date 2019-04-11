@@ -1,3 +1,7 @@
+"""
+    Runs pipeline for a three video streams with shared model with batch_size=3
+"""
+
 import os
 
 from core.structures import VideoSourceConfig

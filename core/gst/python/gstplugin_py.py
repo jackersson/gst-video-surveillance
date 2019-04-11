@@ -77,8 +77,10 @@ class GstPluginPy(Gst.Element):
 
         self.model = None
 
-    def chainfunc(self, pad, parent, buffer):
-
+    def chainfunc(self, pad: Gst.Pad, parent, buffer: Gst.Buffer) -> Gst.FlowReturn:
+        """
+        :param parent: GstPluginPy
+        """
         # Get Buffer Width/Height
         success, (width, height) = get_buffer_size(
             self.srcpad.get_current_caps())
@@ -105,41 +107,31 @@ class GstPluginPy(Gst.Element):
 
         return self.srcpad.push(buffer)
 
-    def do_get_property(self, prop):
-        """
-        Args:
-            prop: gobject.GParamSpec
-        """
+    def do_get_property(self, prop: GObject.GParamSpec):
         if prop.name == 'model':
             return self.model
         else:
             raise AttributeError('unknown property %s' % prop.name)
 
-    def do_set_property(self, prop, value):
-        """
-        Args:
-            prop: gobject.GParamSpec
-            value: object
-        """
-
+    def do_set_property(self, prop: GObject.GParamSpec, value):
         if prop.name == 'model':
             self.model = value
         else:
             raise AttributeError('unknown property %s' % prop.name)
 
-    def eventfunc(self, pad, parent, event):
+    def eventfunc(self, pad: Gst.Pad, parent, event: Gst.Event) -> bool:
         """ Forwards event to SRC (DOWNSTREAM)
             https://lazka.github.io/pgi-docs/Gst-1.0/callbacks.html#Gst.PadEventFunction
         """
         return self.srcpad.push_event(event)
 
-    def srcqueryfunc(self, pad, object, query):
+    def srcqueryfunc(self, pad: Gst.Pad, parent, query: Gst.Query) -> bool:
         """ Forwards query bacj to SINK (UPSTREAM)
             https://lazka.github.io/pgi-docs/Gst-1.0/callbacks.html#Gst.PadQueryFunction
         """
         return self.sinkpad.query(query)
 
-    def srceventfunc(self, pad, parent, event):
+    def srceventfunc(self, pad: Gst.Pad, parent, event: Gst.Event) -> bool:
         """ Forwards event back to SINK (UPSTREAM)
             https://lazka.github.io/pgi-docs/Gst-1.0/callbacks.html#Gst.PadEventFunction
         """
